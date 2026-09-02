@@ -1,0 +1,147 @@
+========================================================================
+ GOVNOTI — DEPLOYMENT GUIDE
+ Indian Defence officer-entry notification tracker
+========================================================================
+
+WHAT YOU ARE DEPLOYING
+------------------------------------------------------------------------
+Two free pieces, no server and no database:
+
+  1. GitHub Actions  -> runs the tracker twice a day and EMAILS you.
+  2. Netlify         -> hosts the simple one-page status UI (read-only).
+
+State lives in public/data/notifications.json and auto-deletes each
+record 2 days after it stops appearing on the official site. Nothing is
+stored permanently.
+
+Your profile (used for eligibility) lives in src/config.js:
+  DOB: 03 September 2003 | Qualification: B.Tech CSE | NCC: No
+
+
+------------------------------------------------------------------------
+ PART A — PREPARE THE EMAIL ACCOUNT (Gmail example)
+------------------------------------------------------------------------
+The tracker sends mail over SMTP. Gmail needs an "App Password".
+
+  1. Go to https://myaccount.google.com/security
+  2. Turn ON 2-Step Verification (required for app passwords).
+  3. Open https://myaccount.google.com/apppasswords
+  4. Create an app password (name it "govnoti").
+  5. Copy the 16-character password. You will paste it as SMTP_PASS.
+
+(Any SMTP provider works — Outlook, Zoho, etc. Just use their host/port.)
+
+
+------------------------------------------------------------------------
+ PART B — PUT THE CODE ON GITHUB
+------------------------------------------------------------------------
+The GovNoti folder must become its own GitHub repository so that the
+workflow file (.github/workflows/track.yml) is at the repo root.
+
+  1. Create a new EMPTY repo on GitHub, e.g. "govnoti" (private is fine).
+
+  2. In a terminal:
+
+       cd "c:\Users\Crosslynx93\Desktop\My-Folder\GovNoti"
+       git init
+       git add .
+       git commit -m "govnoti: initial tracker"
+       git branch -M main
+       git remote add origin https://github.com/<YOUR_USERNAME>/govnoti.git
+       git push -u origin main
+
+  NOTE: node_modules is already ignored by .gitignore — do not commit it.
+
+
+------------------------------------------------------------------------
+ PART C — ADD THE SECRETS (so it can send email)
+------------------------------------------------------------------------
+In your GitHub repo:
+  Settings -> Secrets and variables -> Actions -> "New repository secret"
+
+Add these (name = value):
+
+  SMTP_HOST   smtp.gmail.com
+  SMTP_PORT   465
+  SMTP_USER   your-gmail-address@gmail.com
+  SMTP_PASS   the-16-char-app-password
+  MAIL_TO     where-you-want-alerts@example.com
+  MAIL_FROM   your-gmail-address@gmail.com   (optional; defaults to SMTP_USER)
+
+Never put these in the code. They stay only in GitHub Secrets.
+
+
+------------------------------------------------------------------------
+ PART D — TURN ON AND TEST THE TRACKER
+------------------------------------------------------------------------
+  1. In the repo go to the "Actions" tab.
+  2. If prompted, click "I understand my workflows, enable them".
+  3. Open "Defence Notification Tracker" in the left list.
+  4. Click "Run workflow" (this is the manual trigger) -> Run.
+  5. Watch the run. On success you should receive email(s) and the
+     workflow commits an updated public/data/notifications.json.
+
+After this manual test it runs automatically on schedule:
+     07:00 IST and 18:00 IST every day
+(defined as cron 30 1 * * * and 30 12 * * * UTC in the workflow).
+
+To change the times, edit .github/workflows/track.yml and push.
+
+
+------------------------------------------------------------------------
+ PART E — DEPLOY THE UI ON NETLIFY
+------------------------------------------------------------------------
+  1. Go to https://app.netlify.com -> "Add new site" -> "Import an
+     existing project".
+  2. Connect GitHub and pick the govnoti repo.
+  3. Netlify reads netlify.toml automatically:
+         Publish directory = public
+         Build command     = (none)
+     Leave the fields as detected and click "Deploy".
+  4. Open the site URL. It shows the current tracked notifications with
+     ELIGIBLE / NOT ELIGIBLE / UNCERTAIN tags.
+
+The page just reads data/notifications.json from the repo, which the
+GitHub Action keeps updated. No backend is involved.
+
+
+------------------------------------------------------------------------
+ TEST LOCALLY (optional, no email is sent)
+------------------------------------------------------------------------
+       cd "c:\Users\Crosslynx93\Desktop\My-Folder\GovNoti"
+       npm install
+       npm run track:dry     (prints the emails it WOULD send)
+
+
+------------------------------------------------------------------------
+ TROUBLESHOOTING
+------------------------------------------------------------------------
+- No email arrived:
+    * Check Actions log for "Email failed" lines.
+    * Confirm SMTP_USER/SMTP_PASS secrets are correct (app password, not
+      your normal Gmail password).
+    * Check spam folder; add the sender to contacts.
+
+- Workflow didn't run on schedule:
+    * GitHub pauses scheduled workflows after ~60 days of repo
+      inactivity. Any push or a manual "Run workflow" reactivates it.
+
+- A government site was unreachable:
+    * The log shows "Could not load ..." and the run continues. A 503
+      or timeout is usually temporary; the next run retries.
+
+- Duplicate or noisy emails:
+    * Each notification is emailed once per content version. It is
+      re-emailed only if the official page/PDF materially changes.
+
+- Everything shows "ELIGIBILITY UNCERTAIN":
+    * That is the safe default when the notification text cannot be read
+      confidently. Always open the official PDF link to verify.
+
+
+------------------------------------------------------------------------
+ REMEMBER
+------------------------------------------------------------------------
+The official government/recruitment notification PDF is always the final
+authority. Verify it before applying.
+========================================================================

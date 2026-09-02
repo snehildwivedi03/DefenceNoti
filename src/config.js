@@ -1,0 +1,101 @@
+'use strict';
+
+// ---- Your candidate profile (single source of truth for eligibility) ----
+const PROFILE = {
+  name: 'Candidate',
+  dob: '2003-09-03', // 03 September 2003 (YYYY-MM-DD)
+  qualification: 'B.Tech Computer Science and Engineering',
+  degree: 'engineering',           // has an engineering degree
+  discipline: 'computer science',  // used to match technical-branch requirements
+  ncc: false,
+};
+
+// How many days a record is kept after it was LAST seen on the official site.
+// Nothing is stored permanently: once a notification disappears from the site,
+// its record is deleted 2 days later.
+const PRUNE_DAYS = 2;
+
+// Qualification handling per sub-entry:
+//   'graduate'    -> any bachelor's degree qualifies (CSE is fine)
+//   'engineering' -> engineering degree AND the CSE discipline must be listed
+//   'it'          -> CSE / IT discipline explicitly required (good fit)
+//   'flying'      -> degree + strict age; used for Flying branches
+//
+// watch: true  -> always tracked even if likely NOT ELIGIBLE (hope/backup category)
+
+// ---- Official sources and what to track on each ----
+const SOURCES = [
+  {
+    force: 'UPSC',
+    url: 'https://www.upsc.gov.in/',
+    exams: [
+      {
+        exam: 'CDS',
+        match: /combined\s*defence|c\.?d\.?s\.?/i,
+        subEntries: [
+          { code: 'IMA', qualType: 'graduate', watch: true },
+          { code: 'INA', qualType: 'engineering' },
+          { code: 'AFA', qualType: 'flying', watch: true },
+          { code: 'OTA', qualType: 'graduate' },
+        ],
+      },
+      {
+        exam: 'CAPF AC',
+        match: /central\s*armed\s*police|capf|assistant\s*commandant/i,
+        subEntries: [{ code: 'CAPF AC', qualType: 'graduate' }],
+      },
+    ],
+  },
+  {
+    force: 'Indian Army',
+    url: 'https://www.joinindianarmy.nic.in/',
+    exams: [
+      {
+        exam: 'TGC',
+        match: /technical\s*graduate|\btgc\b/i,
+        subEntries: [{ code: 'TGC', qualType: 'engineering', priority: true }],
+      },
+      {
+        exam: 'SSC Tech',
+        match: /ssc\s*\(?\s*tech|short\s*service.*tech|ssc\s*tech/i,
+        subEntries: [{ code: 'SSC Tech', qualType: 'engineering' }],
+      },
+    ],
+  },
+  {
+    force: 'Indian Navy',
+    url: 'https://www.joinindiannavy.gov.in/',
+    exams: [
+      {
+        exam: 'SSC IT',
+        match: /ssc.*\bit\b|information\s*technology/i,
+        subEntries: [{ code: 'SSC IT', qualType: 'it', priority: true }],
+      },
+      {
+        exam: 'SSC Officer',
+        match: /\bssc\b|executive|logistics|\bnaic\b|technical/i,
+        subEntries: [{ code: 'SSC', qualType: 'graduate' }],
+      },
+    ],
+  },
+  {
+    force: 'Indian Air Force',
+    url: 'https://afcat.cdac.in/',
+    exams: [
+      {
+        exam: 'AFCAT',
+        match: /afcat/i,
+        subEntries: [
+          { code: 'Ground Duty (Non-Tech)', qualType: 'graduate' },
+          { code: 'Ground Duty (Tech)', qualType: 'engineering' },
+          { code: 'Flying', qualType: 'flying', watch: true },
+        ],
+      },
+    ],
+  },
+];
+
+// Things we explicitly never track (safety net for anchor matching).
+const EXCLUDE = /\bnda\b|agniveer|\btes\b|national\s*defence\s*academy|gate|ncc\s*special/i;
+
+module.exports = { PROFILE, PRUNE_DAYS, SOURCES, EXCLUDE };

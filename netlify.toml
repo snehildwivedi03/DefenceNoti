@@ -1,0 +1,10 @@
+# Netlify hosts only the static one-page status UI.
+# All fetching/emailing happens in GitHub Actions, not here.
+[build]
+  publish = "public"
+  command = ""
+
+[[headers]]
+  for = "/data/notifications.json"
+  [headers.values]
+    Cache-Control = "no-cache"

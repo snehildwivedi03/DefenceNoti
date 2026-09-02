@@ -1,0 +1,15 @@
+{
+  "name": "govnoti",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal Indian Defence officer-entry notification tracker (runs on GitHub Actions, UI on Netlify).",
+  "scripts": {
+    "track": "node src/track.js",
+    "track:dry": "DRY_RUN=1 node src/track.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "nodemailer": "^6.9.14",
+    "pdf-parse": "^1.1.1"
+  }
+}
