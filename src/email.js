@@ -49,7 +49,7 @@ async function sendResult(r) {
   const transport = makeTransport();
   await transport.sendMail({
     from: process.env.MAIL_FROM || process.env.SMTP_USER,
-    to: process.env.MAIL_TO || process.env.SMTP_USER,
+    to: process.env.MAIL_TO || 'snehildwivedi03@gmail.com',
     subject,
     text: body,
   });
