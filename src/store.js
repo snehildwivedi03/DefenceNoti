@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { PRUNE_DAYS } = require('./config');
+const { PRUNE_DAYS, PROVISIONAL_PRUNE_DAYS } = require('./config');
 
 const FILE = path.join(__dirname, '..', 'public', 'data', 'notifications.json');
 
@@ -24,17 +24,57 @@ function save(data) {
 }
 
 // Delete records not seen in the last PRUNE_DAYS days -> nothing kept permanently.
+// Provisional (third-party-only) records use the shorter PROVISIONAL_PRUNE_DAYS.
 function prune(data) {
-  const cutoff = Date.now() - PRUNE_DAYS * 86400000;
+  const now = Date.now();
+  const cutoff = now - PRUNE_DAYS * 86400000;
+  const provCutoff = now - PROVISIONAL_PRUNE_DAYS * 86400000;
   let removed = 0;
   for (const [key, rec] of Object.entries(data.records)) {
-    if (!rec.lastSeen || new Date(rec.lastSeen).getTime() < cutoff) {
+    const limit = rec.provisional ? provCutoff : cutoff;
+    if (!rec.lastSeen || new Date(rec.lastSeen).getTime() < limit) {
       delete data.records[key];
       removed++;
     }
   }
-  if (removed) console.log(`Pruned ${removed} record(s) older than ${PRUNE_DAYS} days.`);
+  if (removed) console.log(`Pruned ${removed} record(s) past their retention window.`);
   return data;
 }
 
-module.exports = { load, save, prune, FILE };
+// Stable key for a third-party provisional entry (deduped by exam, not URL).
+function provisionalKey(force, exam) {
+  return `provisional::${force}::${exam}`;
+}
+
+// True if the exam is already tracked from a confirmed (official) fetch.
+function hasConfirmedExam(data, force, exam) {
+  return Object.values(data.records).some(
+    (r) => !r.provisional && r.force === force && r.exam === exam
+  );
+}
+
+// Flip any provisional record for this exam to confirmed once the official
+// fetcher corroborates it. Returns true if something was upgraded.
+function upgradeProvisional(data, force, exam, nowIso) {
+  const stamp = nowIso || new Date().toISOString();
+  let upgraded = false;
+  for (const rec of Object.values(data.records)) {
+    if (rec.provisional && rec.force === force && rec.exam === exam) {
+      rec.provisional = false;
+      rec.upgradedAt = stamp;
+      rec.lastSeen = stamp;
+      upgraded = true;
+    }
+  }
+  return upgraded;
+}
+
+module.exports = {
+  load,
+  save,
+  prune,
+  FILE,
+  provisionalKey,
+  hasConfirmedExam,
+  upgradeProvisional,
+};

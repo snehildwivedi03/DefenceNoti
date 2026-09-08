@@ -15,6 +15,11 @@ const PROFILE = {
 // its record is deleted 2 days later.
 const PRUNE_DAYS = 2;
 
+// Provisional (third-party-only) entries get a much shorter window: if the
+// official site has not corroborated a third-party listing within a day, it is
+// more likely noise (rumor / coaching post / misclassification) than real.
+const PROVISIONAL_PRUNE_DAYS = 1;
+
 // Qualification handling per sub-entry:
 //   'graduate'    -> any bachelor's degree qualifies (CSE is fine)
 //   'engineering' -> engineering degree AND the CSE discipline must be listed
@@ -98,4 +103,22 @@ const SOURCES = [
 // Things we explicitly never track (safety net for anchor matching).
 const EXCLUDE = /\bnda\b|agniveer|\btes\b|national\s*defence\s*academy|gate|ncc\s*special/i;
 
-module.exports = { PROFILE, PRUNE_DAYS, SOURCES, EXCLUDE };
+// ---- Secondary, NON-authoritative discovery layer ----
+// Third-party aggregator pages polled only to catch notifications faster or
+// that the official-site scraper missed. Never a replacement for official
+// eligibility/date data. Add more sites here without touching thirdparty.js.
+// `selectors` are optional CSS overrides for that site's listing markup.
+const THIRD_PARTY_SOURCES = [
+  {
+    site: 'govtjobsalert',
+    url: 'https://govtjobsalert.in/defence-jobs/',
+    selectors: { item: 'article', link: 'h2 a, h3 a, a', date: 'time, .date, .entry-date, .posted-on' },
+  },
+  {
+    site: 'testbook',
+    url: 'https://testbook.com/news/defence-jobs/',
+    selectors: { item: 'article, li.card, .article-card', link: 'h2 a, h3 a, a', date: 'time, .date, .published-date' },
+  },
+];
+
+module.exports = { PROFILE, PRUNE_DAYS, PROVISIONAL_PRUNE_DAYS, SOURCES, EXCLUDE, THIRD_PARTY_SOURCES };

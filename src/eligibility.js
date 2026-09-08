@@ -79,4 +79,52 @@ function classify({ text, subEntry, fields }) {
   return { status, reason: reasons.join(' | '), ageDetail: age, qualDetail: qual };
 }
 
-module.exports = { classify, ELIGIBLE, NOT_ELIGIBLE, UNCERTAIN };
+const ADMIT_CARD_RE = /admit\s*card|hall\s*ticket|e-?admit|call\s*letter/i;
+
+function isAdmitCard(text) {
+  return ADMIT_CARD_RE.test(text || '');
+}
+
+// Deterministic qualification-only eligibility from the PROFILE, independent of
+// any notification text. Used for admit cards / third-party listings whose text
+// carries no age or qualification criteria of its own.
+function profileQualifies(qualType) {
+  const hasDegree = !!PROFILE.degree;
+  const isEngg = PROFILE.degree === 'engineering';
+  const isCse = /computer\s*science|\bcse\b|information\s*technology|\bit\b/i.test(PROFILE.discipline || '');
+  switch (qualType) {
+    case 'graduate':
+      return hasDegree;
+    case 'it':
+      return isCse;
+    case 'engineering':
+      return isEngg && isCse;
+    case 'flying':
+      return false; // age + medical decide flying; not a pure qualification gate
+    default:
+      return false;
+  }
+}
+
+// Safeguard: decide whether an alert should actually be emailed.
+//   - watch (hope/backup) entries always pass, by design.
+//   - admit cards carry no criteria, so gate on static PROFILE qualification.
+//   - a deterministic NOT ELIGIBLE is never emailed.
+//   - UNCERTAIN is emailed unless STRICT_ELIGIBLE_ONLY is set.
+function passesEmailGate({ status, subEntry, admitCard }) {
+  if (subEntry && subEntry.watch) return true;
+  if (admitCard) return profileQualifies(subEntry ? subEntry.qualType : null);
+  if (status === NOT_ELIGIBLE) return false;
+  if (status === UNCERTAIN && process.env.STRICT_ELIGIBLE_ONLY) return false;
+  return true;
+}
+
+module.exports = {
+  classify,
+  isAdmitCard,
+  profileQualifies,
+  passesEmailGate,
+  ELIGIBLE,
+  NOT_ELIGIBLE,
+  UNCERTAIN,
+};

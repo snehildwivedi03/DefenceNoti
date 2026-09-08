@@ -42,6 +42,37 @@ function buildEmail(r) {
 
 async function sendResult(r) {
   const { subject, body } = buildEmail(r);
+  await deliver(subject, body);
+}
+
+// Third-party-only alert: visibly marked as unconfirmed, no full eligibility
+// scoring, and a clear "verify on the official site" caveat.
+function buildProvisionalEmail(r) {
+  const subject = `[UNCONFIRMED] ${r.force} ${r.exam}${r.year ? ' ' + r.year : ''} - seen on ${r.sourceSite}`;
+  const line = (k, v) => `${k.padEnd(22)}: ${v || 'N/A'}`;
+  const body = [
+    line('Entry / Exam', r.exam),
+    line('Force', r.force),
+    line('Listing title', r.title),
+    line('Seen on', r.sourceSite),
+    line('Posted date (raw)', r.rawDate),
+    line('Preliminary note', r.status),
+    line('Reason', r.reason),
+    line('Listing link', r.url),
+    '',
+    `>> Seen on ${r.sourceSite}, not yet confirmed on the official ${r.force} site.`,
+    '   Verify before relying on this. This is a third-party heads-up only, not',
+    '   an official notification and it has NOT been eligibility-scored.',
+  ].join('\n');
+  return { subject, body };
+}
+
+async function sendProvisional(r) {
+  const { subject, body } = buildProvisionalEmail(r);
+  await deliver(subject, body);
+}
+
+async function deliver(subject, body) {
   if (process.env.DRY_RUN) {
     console.log('--- DRY RUN EMAIL ---\n' + subject + '\n' + body + '\n');
     return;
@@ -56,4 +87,4 @@ async function sendResult(r) {
   console.log('Emailed:', subject);
 }
 
-module.exports = { sendResult, buildEmail };
+module.exports = { sendResult, buildEmail, sendProvisional, buildProvisionalEmail };
