@@ -1,4 +1,20 @@
 {
-  "updatedAt": "2026-09-07T17:48:24.765Z",
-  "records": {}
+  "updatedAt": "2026-09-08T06:05:39.584Z",
+  "records": {
+    "provisional::Indian Navy::SSC Officer": {
+      "force": "Indian Navy",
+      "exam": "SSC Officer",
+      "subCode": "SSC Officer",
+      "title": "Job PostLast Date: 04 Mar 2026 AFMS Medical Officer (SSC) Recruitment 2026: Apply Online, Salary ₹61,300 – ₹1,07,900 Org: Defence Updated on 01 Mar 2026",
+      "status": "UNCONFIRMED",
+      "reason": "Any bachelor’s degree entry (unconfirmed) – likely eligible; verify.",
+      "url": "https://govtjobsalert.in/afms-medical-officer-ssc-recruitment-2026/",
+      "hash": "87adb2c252293fe90eca063b5928590c41b9c156ebeb966132c9a9de8cf4c75b",
+      "emailed": true,
+      "firstSeen": "2026-09-08T06:05:39.268Z",
+      "lastSeen": "2026-09-08T06:05:39.268Z",
+      "provisional": true,
+      "origin": "thirdparty:govtjobsalert"
+    }
+  }
 }
