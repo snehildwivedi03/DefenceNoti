@@ -37,6 +37,7 @@ const { fetchThirdPartyListings, buildConcludedSet, buildLatestCycle, isSupersed
 const { processThirdParty } = require('../src/track');
 const { buildProvisionalEmail } = require('../src/email');
 const { hasConfirmedExam, upgradeProvisional, provisionalKey } = require('../src/store');
+const { isStale, newestDate, cleanState } = require('../src/cleaner');
 const {
   passesEmailGate,
   profileQualifies,
@@ -220,6 +221,32 @@ function pass(msg) {
   );
   assert.strictEqual(editionYear('AFCAT 1 2026 Notification'), 2026, 'year parsed');
   pass('supersession engine drops older editions when a newer one exists');
+
+  // 12. Lifecycle cleaner: an entry whose newest date is long past (application
+  //     window closed / exam over) is expired; entries with no date or a future
+  //     date are kept. Hindi month names are understood.
+  const asOf = new Date('2026-09-11T00:00:00Z');
+  assert.strictEqual(
+    isStale('Indian Navy SSC Officer Recruitment 2026: \u0905\u0927\u093F\u0938\u0942\u091A\u0928\u093E, 16 \u092E\u0908 \u0938\u0947 \u0906\u0935\u0947\u0926\u0928 \u0936\u0941\u0930\u0942', asOf),
+    true,
+    'application opened 16 May (Hindi) -> window over'
+  );
+  assert.strictEqual(isStale('CDS 2 Admit Card 2026 Out, Download Hall Ticket PDF', asOf), false, 'no readable date -> kept');
+  assert.strictEqual(isStale('Admit Card Out, Exam on 20 December 2026', asOf), false, 'future exam date -> kept');
+  assert.strictEqual(isStale('Notification, last date 5 June 2026', asOf), true, 'deadline in past -> expired');
+  assert.ok(newestDate('Exam 24 August 2026 and 20 December 2026', asOf).getUTCMonth() === 11, 'newest of multiple dates chosen');
+
+  const cleanTarget = {
+    records: {
+      dead: { force: 'Indian Navy', exam: 'SSC Officer', title: 'Recruitment, 16 May 2026 apply', reason: '' },
+      alive: { force: 'UPSC', exam: 'CDS', title: 'CDS 2 Admit Card 2026 Out', reason: '' },
+    },
+  };
+  const removed = cleanState(cleanTarget, asOf);
+  assert.strictEqual(removed, 1, 'exactly one expired record cleaned');
+  assert.ok(!cleanTarget.records.dead, 'expired record deleted from state');
+  assert.ok(cleanTarget.records.alive, 'live record retained');
+  pass('lifecycle cleaner expires closed-window / held-exam entries and purges the JSON');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {

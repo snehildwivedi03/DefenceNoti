@@ -8,6 +8,7 @@
 const cheerio = require('cheerio');
 const { SOURCES, EXCLUDE, THIRD_PARTY_SOURCES } = require('./config');
 const { httpGet } = require('./fetcher');
+const { isStale } = require('./cleaner');
 
 const DEFAULT_SELECTORS = {
   item: 'article',
@@ -28,11 +29,18 @@ const SSC_CLERICAL = /\bchsl\b|\bcgl\b|\bmts\b|constable|stenographer|\bcpo\b|su
 
 const ADMIT = /admit\s*card|hall\s*ticket|e-?admit|call\s*letter/i;
 
+// A real posting is dated or names a concrete event (notification is out, admit
+// card / result released, vacancies, apply-online...). Bare category or menu
+// anchors like "SSC Jobs" or "SSC Recruitment" have no year and no such signal,
+// so they are ignored.
+const SUBSTANCE = /\b20\d{2}\b|notification|admit\s*card|hall\s*ticket|call\s*letter|answer\s*key|\bresult\b|online\s*form|apply\s*online|vacanc|bharti|\bout\b|released|score\s*card|merit\s*list/i;
+
 // Run a listing title through the SAME anchor-matching logic the official
 // pipeline uses: drop EXCLUDE/NOISE hits, otherwise return the first exam whose
 // `match` regex fires. Returns null when nothing (in scope) matches.
 function classifyTitle(title) {
   if (!title || EXCLUDE.test(title) || NOISE.test(title) || SSC_CLERICAL.test(title)) return null;
+  if (!SUBSTANCE.test(title)) return null; // generic nav/category anchor -> ignore.
   for (const source of SOURCES) {
     for (const exam of source.exams) {
       if (exam.match.test(title)) {
@@ -200,8 +208,12 @@ async function fetchThirdPartyListings() {
       console.log(`  - dropped superseded listing (newer edition exists): ${match.exam} ${editionNumber(item.title)}`);
       continue;
     }
-    if (match.admitCard && concluded.has(editionKey(match.force, match.exam, item.title))) {
-      console.log(`  - dropped stale admit card (exam already held): ${match.exam} ${editionNumber(item.title)}`);
+    if (concluded.has(editionKey(match.force, match.exam, item.title))) {
+      console.log(`  - dropped concluded-exam listing (exam already held): ${match.exam} ${editionNumber(item.title)}`);
+      continue;
+    }
+    if (isStale(item.title)) {
+      console.log(`  - dropped expired listing (application window over): ${match.exam}`);
       continue;
     }
     out.push({

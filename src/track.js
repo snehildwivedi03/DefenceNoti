@@ -8,6 +8,7 @@ const { sendResult, sendProvisional } = require('./email');
 const { load, save, prune, provisionalKey, hasConfirmedExam, upgradeProvisional } = require('./store');
 const { sha256 } = require('./util');
 const { fetchThirdPartyListings } = require('./thirdparty');
+const { cleanState } = require('./cleaner');
 // Only follow links that look like a notification (PDF or advert page).
 function looksLikeNotification(href, text) {
   const blob = `${href} ${text}`;
@@ -294,6 +295,9 @@ async function main() {
     console.warn(`  ! third-party stage failed (ignored): ${err.message}`);
   }
 
+  // Purge entries whose application window / exam date has already passed, then
+  // drop anything past its retention window.
+  cleanState(state);
   prune(state);
   save(state);
   console.log(`\nDone. ${Object.keys(state.records).length} active record(s).`);
