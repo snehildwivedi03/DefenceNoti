@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-11T13:22:49.815Z",
+  "updatedAt": "2026-09-11T19:13:40.841Z",
   "records": {
     "7d4c64df9f77e44d3a9238f740d8864bfbc13a948f4a51d49ee5810f9ed49edb": {
       "force": "UPSC",
@@ -74,10 +74,10 @@
       "reason": "Admit card / hall ticket reported out – download and verify on the official site.",
       "url": "https://testbook.com/news/upsc-cds-2-admit-card-2026-out/",
       "hash": "369beaa58925bb02bc4050ad8e63555120094042fcb651f86f6f16759b3acc7e",
-      "emailed": false,
-      "pendingRetry": true,
+      "emailed": true,
+      "pendingRetry": false,
       "firstSeen": "2026-09-11T13:22:49.814Z",
-      "lastSeen": "2026-09-11T13:22:49.814Z",
+      "lastSeen": "2026-09-11T19:13:39.826Z",
       "provisional": true,
       "admitCard": true,
       "origin": "thirdparty:testbook"
