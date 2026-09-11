@@ -110,6 +110,18 @@ function editionNumber(title) {
   return ROMAN[t] || t;
 }
 
+// Pull the exam-cycle year (a 4-digit 20xx) from a title, if present.
+function editionYear(title) {
+  const m = String(title).match(/\b(20\d{2})\b/);
+  return m ? Number(m[1]) : null;
+}
+
+// Rank a cycle so newer sorts higher: later year always beats earlier year, and
+// within a year a higher edition beats a lower one. Missing parts count as 0.
+function cycleRank(year, edition) {
+  return (year || 0) * 10 + (edition ? Number(edition) : 0);
+}
+
 // First matching exam for a title, WITHOUT the EXCLUDE/NOISE filtering (we want
 // to see post-exam signals even though they are dropped from the alert stream).
 function examOf(title) {
@@ -136,6 +148,34 @@ function buildConcludedSet(titles) {
   return set;
 }
 
+// ---- Supersession engine ----
+// Record the newest cycle (force::exam -> highest cycleRank) seen anywhere in
+// the feed. Only titles that carry an edition number contribute, so a generic
+// "AFCAT Notification" never establishes or loses to a cycle.
+function buildLatestCycle(titles) {
+  const latest = new Map();
+  for (const title of titles) {
+    const ed = editionNumber(title);
+    if (!ed) continue;
+    const ex = examOf(title);
+    if (!ex) continue;
+    const key = `${ex.force}::${ex.exam}`;
+    const rank = cycleRank(editionYear(title), ed);
+    if (!latest.has(key) || rank > latest.get(key)) latest.set(key, rank);
+  }
+  return latest;
+}
+
+// A listing is superseded when a strictly newer cycle of the SAME exam exists.
+// No readable edition -> keep (we cannot prove it is stale).
+function isSuperseded(latest, force, exam, title) {
+  const ed = editionNumber(title);
+  if (!ed) return false;
+  const key = `${force}::${exam}`;
+  if (!latest.has(key)) return false;
+  return cycleRank(editionYear(title), ed) < latest.get(key);
+}
+
 // Fetch every configured third-party page, then classify. Each site is isolated:
 // one being unreachable or having broken markup never blocks the others. Admit
 // cards for exams that have already concluded are dropped.
@@ -150,11 +190,16 @@ async function fetchThirdPartyListings() {
   }
 
   const concluded = buildConcludedSet(raw.map((r) => r.title));
+  const latest = buildLatestCycle(raw.map((r) => r.title));
 
   const out = [];
   for (const item of raw) {
     const match = classifyTitle(item.title);
     if (!match) continue; // unclassified / EXCLUDE / NOISE -> out of scope.
+    if (isSuperseded(latest, match.force, match.exam, item.title)) {
+      console.log(`  - dropped superseded listing (newer edition exists): ${match.exam} ${editionNumber(item.title)}`);
+      continue;
+    }
     if (match.admitCard && concluded.has(editionKey(match.force, match.exam, item.title))) {
       console.log(`  - dropped stale admit card (exam already held): ${match.exam} ${editionNumber(item.title)}`);
       continue;
@@ -179,6 +224,9 @@ module.exports = {
   classifyTitle,
   extractListings,
   buildConcludedSet,
+  buildLatestCycle,
+  isSuperseded,
   editionKey,
   editionNumber,
+  editionYear,
 };

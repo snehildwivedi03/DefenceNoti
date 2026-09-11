@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-11T12:42:41.563Z",
+  "updatedAt": "2026-09-11T12:48:36.782Z",
   "records": {
     "7d4c64df9f77e44d3a9238f740d8864bfbc13a948f4a51d49ee5810f9ed49edb": {
       "force": "UPSC",
@@ -13,8 +13,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:42:34.269Z",
-      "lastSeen": "2026-09-11T12:42:34.269Z",
+      "firstSeen": "2026-09-11T12:48:28.678Z",
+      "lastSeen": "2026-09-11T12:48:28.678Z",
       "changed": false
     },
     "6c6bdfb59bd8302c282515b1c9afa417993bd9f7adca85303f42fa9aa7cdb20d": {
@@ -29,8 +29,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:42:34.272Z",
-      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "firstSeen": "2026-09-11T12:48:28.685Z",
+      "lastSeen": "2026-09-11T12:48:28.685Z",
       "changed": false
     },
     "c6f78f2062da683df3e0d612d5b38da3f681023733be63dc60bf536888844cdf": {
@@ -45,8 +45,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:42:34.272Z",
-      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "firstSeen": "2026-09-11T12:48:28.685Z",
+      "lastSeen": "2026-09-11T12:48:28.685Z",
       "changed": false
     },
     "1966d2346aae8b7f9cc9ea2a471c01c733f4a2b67ca9987ce624a7ceaf25f43c": {
@@ -61,8 +61,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:42:34.272Z",
-      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "firstSeen": "2026-09-11T12:48:28.685Z",
+      "lastSeen": "2026-09-11T12:48:28.685Z",
       "changed": false
     },
     "provisional::Indian Navy::SSC Officer": {
@@ -76,8 +76,8 @@
       "hash": "0d0c9447baad8b4321c8af147d22103b56b11b0321b0aba1a144128e9d789585",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:42:41.552Z",
-      "lastSeen": "2026-09-11T12:42:41.561Z",
+      "firstSeen": "2026-09-11T12:48:36.767Z",
+      "lastSeen": "2026-09-11T12:48:36.781Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -93,8 +93,8 @@
       "hash": "2335589b3bbc144535431d922786d1c5e1ff6603f95aab58c3ec0ffe460377a2",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:42:41.555Z",
-      "lastSeen": "2026-09-11T12:42:41.561Z",
+      "firstSeen": "2026-09-11T12:48:36.773Z",
+      "lastSeen": "2026-09-11T12:48:36.781Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -103,15 +103,15 @@
       "force": "Indian Air Force",
       "exam": "AFCAT",
       "subCode": "AFCAT",
-      "title": "AFCAT 1 2026 Notification Out, Registration Starts from 17 November, Download Official PDF",
+      "title": "AFCAT 2 Notification 2026 Out, 379 Vacancies, Apply Online Link Active, Last Date Extended",
       "status": "UNCONFIRMED",
       "reason": "Any bachelor’s degree entry (unconfirmed) – likely eligible; verify.",
-      "url": "https://testbook.com/news/afcat-2026-notification-out/",
-      "hash": "cff633082a6cf4211c01dc819730bcf2af5166209cdea335a55d0658ccdfcd63",
+      "url": "https://testbook.com/news/afcat-notification-2026-out/",
+      "hash": "1108ebff2288c71581f5e5a5533daf6b4ff5b2311953599073a1dae940bb16a1",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:42:41.556Z",
-      "lastSeen": "2026-09-11T12:42:41.562Z",
+      "firstSeen": "2026-09-11T12:48:36.775Z",
+      "lastSeen": "2026-09-11T12:48:36.779Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -127,8 +127,8 @@
       "hash": "ba73994dfdc92b5e76e93a1afead503cb57ca087fc699adbbd2723351909b0f8",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:42:41.560Z",
-      "lastSeen": "2026-09-11T12:42:41.560Z",
+      "firstSeen": "2026-09-11T12:48:36.780Z",
+      "lastSeen": "2026-09-11T12:48:36.780Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -144,8 +144,8 @@
       "hash": "369beaa58925bb02bc4050ad8e63555120094042fcb651f86f6f16759b3acc7e",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:42:41.562Z",
-      "lastSeen": "2026-09-11T12:42:41.562Z",
+      "firstSeen": "2026-09-11T12:48:36.781Z",
+      "lastSeen": "2026-09-11T12:48:36.781Z",
       "provisional": true,
       "admitCard": true,
       "origin": "thirdparty:testbook"

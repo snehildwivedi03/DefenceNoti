@@ -33,7 +33,7 @@ global.fetch = async (url) => {
   };
 };
 
-const { fetchThirdPartyListings, buildConcludedSet, editionKey, editionNumber } = require('../src/thirdparty');
+const { fetchThirdPartyListings, buildConcludedSet, buildLatestCycle, isSuperseded, editionKey, editionNumber, editionYear } = require('../src/thirdparty');
 const { processThirdParty } = require('../src/track');
 const { buildProvisionalEmail } = require('../src/email');
 const { hasConfirmedExam, upgradeProvisional, provisionalKey } = require('../src/store');
@@ -183,6 +183,43 @@ function pass(msg) {
   assert.strictEqual(editionNumber('AFCAT 2 Admit Card 2026'), '2', 'numeric edition parsed');
   assert.strictEqual(editionNumber('Indian Army TGC 144 Notification'), '', 'no false edition from vacancy count');
   pass('concluded-exam engine drops stale admit cards');
+
+  // 11. Supersession engine: when a newer edition of an exam is present, older
+  //     editions (notifications AND admit cards) are treated as stale.
+  const latest = buildLatestCycle([
+    'AFCAT 2 2026 Admit Card Out',
+    'AFCAT 1 2026 Notification Out, Registration Starts',
+    'CDS 2 Admit Card 2026 Out',
+  ]);
+  assert.strictEqual(
+    isSuperseded(latest, 'Indian Air Force', 'AFCAT', 'AFCAT 1 2026 Notification Out'),
+    true,
+    'AFCAT 1 2026 superseded by AFCAT 2 2026'
+  );
+  assert.strictEqual(
+    isSuperseded(latest, 'Indian Air Force', 'AFCAT', 'AFCAT 2 2026 Admit Card Out'),
+    false,
+    'newest AFCAT edition kept'
+  );
+  assert.strictEqual(
+    isSuperseded(latest, 'UPSC', 'CDS', 'CDS 2 Admit Card 2026 Out'),
+    false,
+    'sole CDS edition kept'
+  );
+  // A higher year always wins even against a higher edition of an older year.
+  const crossYear = buildLatestCycle(['AFCAT 1 2027 Notification Out', 'AFCAT 2 2026 Result Out']);
+  assert.strictEqual(
+    isSuperseded(crossYear, 'Indian Air Force', 'AFCAT', 'AFCAT 2 2026 Admit Card'),
+    true,
+    'AFCAT 2 2026 superseded by AFCAT 1 2027'
+  );
+  assert.strictEqual(
+    isSuperseded(crossYear, 'Indian Air Force', 'AFCAT', 'AFCAT 1 2027 Notification'),
+    false,
+    'newest-year edition kept'
+  );
+  assert.strictEqual(editionYear('AFCAT 1 2026 Notification'), 2026, 'year parsed');
+  pass('supersession engine drops older editions when a newer one exists');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {
