@@ -129,6 +129,7 @@ async function processLink(source, exam, link, state) {
       hash,
       emailed: emailSent,
       pendingRetry: emailAllowed && !emailSent,
+      admitCard,
       firstSeen: prev ? prev.firstSeen : nowIso,
       lastSeen: nowIso,
       changed: !!prev,

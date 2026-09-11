@@ -33,7 +33,11 @@ function tagClass(status) {
 
 function render() {
   const rows = records
-    .filter((r) => filter === 'ALL' || r.status === filter)
+    .filter((r) => {
+      if (filter === 'ALL') return true;
+      if (filter === 'ADMIT CARD') return !!r.admitCard || /admit\s*card/i.test(r.status || '');
+      return r.status === filter;
+    })
     .sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen));
 
   if (!rows.length) {
@@ -45,13 +49,16 @@ function render() {
     .map(
       (r) => {
         const m = forceMeta(r.force);
+        const isAdmit = !!r.admitCard || /admit\s*card/i.test(r.status || '');
+        const admitBadge = isAdmit ? '<span class="tag admit">ADMIT CARD</span>' : '';
+        const provBadge = r.provisional ? '<span class="tag prov">UNCONFIRMED</span>' : '';
         return `
-      <div class="item ${m.cls}">
+      <div class="item ${m.cls}${isAdmit ? ' is-admit' : ''}">
         <div class="top">
           <span class="title">${m.icon}${esc(r.force)} &middot; ${esc(r.exam)} &middot; ${esc(r.subCode)}${
         r.changed ? ' (updated)' : ''
       }</span>
-          <span class="tag ${tagClass(r.status)}">${esc(r.status)}</span>
+          <span class="tags">${admitBadge}${provBadge}<span class="tag ${tagClass(r.status)}">${esc(r.status)}</span></span>
         </div>
         <div class="meta">${esc(r.title || '')}</div>
         <div class="reason">${esc(r.reason || '')}</div>
@@ -67,7 +74,7 @@ function esc(s) {
 }
 
 function buildFilters() {
-  const opts = ['ALL', 'ELIGIBLE', 'NOT ELIGIBLE', 'ELIGIBILITY UNCERTAIN'];
+  const opts = ['ALL', 'ADMIT CARD', 'ELIGIBLE', 'NOT ELIGIBLE', 'ELIGIBILITY UNCERTAIN'];
   filtersEl.innerHTML = opts
     .map((o) => `<button data-f="${o}"${o === filter ? ' class="active"' : ''}>${o.toLowerCase()}</button>`)
     .join('');
