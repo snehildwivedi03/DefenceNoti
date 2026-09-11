@@ -64,13 +64,13 @@ function pass(msg) {
   assert.strictEqual(listings.length, 3, 'exactly the 3 in-scope defence listings');
   pass('classification + EXCLUDE + unclassified drop');
 
-  // 2. The CDS admit card produces a NEW provisional [UNCONFIRMED] email.
+  // 2. The CDS admit card produces a NEW provisional [ADMIT CARD] email.
   const state = { updatedAt: null, records: {} };
   const results = await processThirdParty(state);
   const cds = results.find((r) => r.exam === 'CDS' && r.action === 'provisional-new');
   assert.ok(cds, 'CDS admit card should be a new provisional alert');
   const mail = buildProvisionalEmail(cds.payload);
-  assert.ok(/\[UNCONFIRMED\]/.test(mail.subject), 'subject marked [UNCONFIRMED]');
+  assert.ok(/\[ADMIT CARD\]/.test(mail.subject), 'admit-card subject marked [ADMIT CARD]');
   assert.ok(/CDS/.test(mail.subject), 'subject mentions CDS');
   assert.ok(/Admit Card/i.test(cds.payload.title), 'CDS admit-card wording carried through');
   assert.ok(/not yet confirmed on the official/i.test(mail.body), 'body has the verify caveat');
@@ -82,27 +82,28 @@ function pass(msg) {
   pass('AFCAT + TGC also alert');
 
   // 3. Stored as provisional with origin + a shorter prune window flag.
-  const cdsKey = provisionalKey('UPSC', 'CDS');
+  const cdsKey = provisionalKey('UPSC', 'CDS', 'admit');
   const rec = state.records[cdsKey];
   assert.strictEqual(rec.provisional, true, 'stored as provisional');
   assert.ok(/^thirdparty:/.test(rec.origin), 'origin flagged thirdparty:<site>');
   pass('provisional storage (flag + origin)');
 
-  // 4. Dedup: if the exam is already confirmed officially, only corroborate.
+  // 4. Dedup: a NOTIFICATION already confirmed officially only corroborates.
+  //    (Admit cards deliberately bypass this so they always alert.)
   const state2 = {
     updatedAt: null,
     records: {
       official: {
-        force: 'UPSC', exam: 'CDS', subCode: 'IMA', title: 'CDS', status: 'ELIGIBLE',
-        url: 'https://upsc.gov.in/x', hash: 'h', firstSeen: '2026-09-01T00:00:00Z',
+        force: 'Indian Army', exam: 'TGC', subCode: 'TGC', title: 'TGC', status: 'ELIGIBLE',
+        url: 'https://joinindianarmy.nic.in/x', hash: 'h', firstSeen: '2026-09-01T00:00:00Z',
         lastSeen: new Date().toISOString(),
       },
     },
   };
-  assert.strictEqual(hasConfirmedExam(state2, 'UPSC', 'CDS'), true);
+  assert.strictEqual(hasConfirmedExam(state2, 'Indian Army', 'TGC'), true);
   const results2 = await processThirdParty(state2);
-  const cds2 = results2.find((r) => r.exam === 'CDS');
-  assert.strictEqual(cds2.action, 'corroborated', 'confirmed exam -> corroboration, no duplicate email');
+  const tgc2 = results2.find((r) => r.exam === 'TGC');
+  assert.strictEqual(tgc2.action, 'corroborated', 'confirmed notification -> corroboration, no duplicate email');
   pass('dedup against confirmed official record');
 
   // 5. Re-running does not re-alert an existing provisional (refresh only).
@@ -143,7 +144,7 @@ function pass(msg) {
   const cdsR1 = r1.find((r) => r.exam === 'CDS' && r.action === 'provisional-new');
   assert.ok(cdsR1, 'CDS provisional attempted');
   assert.strictEqual(cdsR1.emailed, false, 'failed send -> emailed:false');
-  const recR = stateR.records[provisionalKey('UPSC', 'CDS')];
+  const recR = stateR.records[provisionalKey('UPSC', 'CDS', 'admit')];
   assert.strictEqual(recR.pendingRetry, true, 'pendingRetry set after a failed send');
 
   const r2 = await processThirdParty(stateR);

@@ -42,8 +42,11 @@ function prune(data) {
 }
 
 // Stable key for a third-party provisional entry (deduped by exam, not URL).
-function provisionalKey(force, exam) {
-  return `provisional::${force}::${exam}`;
+// `kind` separates an admit-card alert from a notification alert for the same
+// exam so both can be tracked and emailed independently.
+function provisionalKey(force, exam, kind) {
+  const base = `provisional::${force}::${exam}`;
+  return kind === 'admit' ? `${base}::admit` : base;
 }
 
 // True if the exam is already tracked from a confirmed (official) fetch.

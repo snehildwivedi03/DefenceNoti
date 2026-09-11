@@ -49,7 +49,8 @@ async function sendResult(r) {
 // Third-party-only alert: visibly marked as unconfirmed, no full eligibility
 // scoring, and a clear "verify on the official site" caveat.
 function buildProvisionalEmail(r) {
-  const subject = `[UNCONFIRMED] ${r.force} ${r.exam}${r.year ? ' ' + r.year : ''} - seen on ${r.sourceSite}`;
+  const tag = /admit\s*card/i.test(r.status || '') || /admit\s*card/i.test(r.exam || '') ? 'ADMIT CARD' : 'UNCONFIRMED';
+  const subject = `[${tag}] ${r.force} ${r.exam}${r.year ? ' ' + r.year : ''} - seen on ${r.sourceSite}`;
   const line = (k, v) => `${k.padEnd(22)}: ${v || 'N/A'}`;
   const body = [
     line('Entry / Exam', r.exam),

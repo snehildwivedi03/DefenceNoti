@@ -167,9 +167,9 @@ function basicProvisionalNote(qualType) {
 async function handleThirdPartyListing(item, state) {
   const nowIso = new Date().toISOString();
 
-  const key = provisionalKey(item.force, item.matchedExamCode);
-  const admit = isAdmitCard(item.title);
+  const admit = item.admitCard || isAdmitCard(item.title);
   const closed = isClosed(item.title);
+  const key = provisionalKey(item.force, item.matchedExamCode, admit ? 'admit' : 'notice');
 
   // Application window has ended (and it is not an admit card) -> no alert.
   // Drop any stale provisional so the website stops showing the dead entry.
@@ -179,8 +179,10 @@ async function handleThirdPartyListing(item, state) {
     return { action: 'closed-skip', exam: item.matchedExamCode, item };
   }
 
-  // Already tracked from an official fetch -> corroboration only, no email.
-  if (hasConfirmedExam(state, item.force, item.matchedExamCode)) {
+  // A notification already tracked officially -> corroboration only, no email.
+  // Admit cards are NOT corroborated away: the official scraper rarely catches
+  // them, so a third-party admit-card heads-up is still worth sending.
+  if (!admit && hasConfirmedExam(state, item.force, item.matchedExamCode)) {
     console.log(`  ~ corroboration: ${item.matchedExamCode} already tracked officially (also seen on ${item.sourceSite}).`);
     return { action: 'corroborated', exam: item.matchedExamCode, item };
   }
@@ -197,16 +199,18 @@ async function handleThirdPartyListing(item, state) {
   }
 
   // Genuinely new -> store as provisional and send an [UNCONFIRMED] email.
-  const note = basicProvisionalNote(item.qualType);
+  const note = admit
+    ? 'Admit card / hall ticket reported out \u2013 download and verify on the official site.'
+    : basicProvisionalNote(item.qualType);
   const payload = {
     force: item.force,
-    exam: item.matchedExamCode,
+    exam: admit ? `${item.matchedExamCode} Admit Card` : item.matchedExamCode,
     title: item.title,
     year: yearFromTitle(item.title),
     url: item.url,
     sourceSite: item.sourceSite,
     rawDate: item.rawDate,
-    status: 'UNCONFIRMED (third-party)',
+    status: admit ? 'ADMIT CARD (third-party)' : 'UNCONFIRMED (third-party)',
     reason: note,
   };
 
@@ -235,7 +239,7 @@ async function handleThirdPartyListing(item, state) {
     exam: item.matchedExamCode,
     subCode: item.matchedExamCode,
     title: item.title,
-    status: 'UNCONFIRMED',
+    status: admit ? 'ADMIT CARD (unconfirmed)' : 'UNCONFIRMED',
     reason: note,
     url: item.url,
     hash: sha256(`${item.url}|${item.title}`),
@@ -244,6 +248,7 @@ async function handleThirdPartyListing(item, state) {
     firstSeen: prev ? prev.firstSeen : nowIso,
     lastSeen: nowIso,
     provisional: true,
+    admitCard: admit,
     origin: `thirdparty:${item.sourceSite}`,
   };
 
