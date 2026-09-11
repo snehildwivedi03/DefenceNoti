@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10T19:11:16.929Z",
+  "updatedAt": "2026-09-11T09:03:30.193Z",
   "records": {
     "provisional::Indian Navy::SSC Officer": {
       "force": "Indian Navy",
@@ -12,9 +12,65 @@
       "hash": "87adb2c252293fe90eca063b5928590c41b9c156ebeb966132c9a9de8cf4c75b",
       "emailed": true,
       "firstSeen": "2026-09-08T06:05:39.268Z",
-      "lastSeen": "2026-09-10T19:11:16.928Z",
+      "lastSeen": "2026-09-11T09:03:30.193Z",
       "provisional": true,
       "origin": "thirdparty:govtjobsalert"
+    },
+    "7d4c64df9f77e44d3a9238f740d8864bfbc13a948f4a51d49ee5810f9ed49edb": {
+      "force": "UPSC",
+      "exam": "CDS",
+      "subCode": "IMA",
+      "title": "e - Admit Card: Combined Defence Services Examination (II), 2026",
+      "status": "ELIGIBILITY UNCERTAIN",
+      "reason": "Age: Age/DOB window could not be read from the notification. | Qualification: Any bachelor’s degree accepted; B.Tech CSE qualifies. | NCC: No (not required for this entry).",
+      "url": "https://www.upsc.gov.in/whats-new/Combined%20Defence%20Services%20Examination%20%28II%29%2C%202026/e%20-%20Admit%20Card",
+      "hash": "c296faf5a83adf891712b6a2a6bbbae39f8d2c4639a9d3587b9a8fe3c2224a08",
+      "emailed": true,
+      "firstSeen": "2026-09-11T09:02:56.272Z",
+      "lastSeen": "2026-09-11T09:02:56.272Z",
+      "changed": false
+    },
+    "6c6bdfb59bd8302c282515b1c9afa417993bd9f7adca85303f42fa9aa7cdb20d": {
+      "force": "UPSC",
+      "exam": "CDS",
+      "subCode": "INA",
+      "title": "e - Admit Card: Combined Defence Services Examination (II), 2026",
+      "status": "ELIGIBILITY UNCERTAIN",
+      "reason": "Age: Age/DOB window could not be read from the notification. | Qualification: Discipline list not readable – verify whether CSE is included. | NCC: No (not required for this entry).",
+      "url": "https://www.upsc.gov.in/whats-new/Combined%20Defence%20Services%20Examination%20%28II%29%2C%202026/e%20-%20Admit%20Card",
+      "hash": "c296faf5a83adf891712b6a2a6bbbae39f8d2c4639a9d3587b9a8fe3c2224a08",
+      "emailed": true,
+      "firstSeen": "2026-09-11T09:02:56.404Z",
+      "lastSeen": "2026-09-11T09:02:56.404Z",
+      "changed": false
+    },
+    "c6f78f2062da683df3e0d612d5b38da3f681023733be63dc60bf536888844cdf": {
+      "force": "UPSC",
+      "exam": "CDS",
+      "subCode": "AFA",
+      "title": "e - Admit Card: Combined Defence Services Examination (II), 2026",
+      "status": "ELIGIBILITY UNCERTAIN",
+      "reason": "Age: Age/DOB window could not be read from the notification. | Qualification: Flying branch – confirm degree + PCM and medical criteria manually. | NCC: No (not required for this entry).",
+      "url": "https://www.upsc.gov.in/whats-new/Combined%20Defence%20Services%20Examination%20%28II%29%2C%202026/e%20-%20Admit%20Card",
+      "hash": "c296faf5a83adf891712b6a2a6bbbae39f8d2c4639a9d3587b9a8fe3c2224a08",
+      "emailed": true,
+      "firstSeen": "2026-09-11T09:02:56.492Z",
+      "lastSeen": "2026-09-11T09:02:56.492Z",
+      "changed": false
+    },
+    "1966d2346aae8b7f9cc9ea2a471c01c733f4a2b67ca9987ce624a7ceaf25f43c": {
+      "force": "UPSC",
+      "exam": "CDS",
+      "subCode": "OTA",
+      "title": "e - Admit Card: Combined Defence Services Examination (II), 2026",
+      "status": "ELIGIBILITY UNCERTAIN",
+      "reason": "Age: Age/DOB window could not be read from the notification. | Qualification: Any bachelor’s degree accepted; B.Tech CSE qualifies. | NCC: No (not required for this entry).",
+      "url": "https://www.upsc.gov.in/whats-new/Combined%20Defence%20Services%20Examination%20%28II%29%2C%202026/e%20-%20Admit%20Card",
+      "hash": "c296faf5a83adf891712b6a2a6bbbae39f8d2c4639a9d3587b9a8fe3c2224a08",
+      "emailed": true,
+      "firstSeen": "2026-09-11T09:02:56.569Z",
+      "lastSeen": "2026-09-11T09:02:56.569Z",
+      "changed": false
     }
   }
 }
