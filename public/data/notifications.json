@@ -1,23 +1,6 @@
 {
-  "updatedAt": "2026-09-11T12:36:30.405Z",
+  "updatedAt": "2026-09-11T12:42:41.563Z",
   "records": {
-    "provisional::Indian Navy::SSC Officer": {
-      "force": "Indian Navy",
-      "exam": "SSC Officer",
-      "subCode": "SSC Officer",
-      "title": "Job PostLast Date: 04 Mar 2026 AFMS Medical Officer (SSC) Recruitment 2026: Apply Online, Salary ₹61,300 – ₹1,07,900 Org: Defence Updated on 01 Mar 2026",
-      "status": "UNCONFIRMED",
-      "reason": "Any bachelor’s degree entry (unconfirmed) – likely eligible; verify.",
-      "url": "https://govtjobsalert.in/afms-medical-officer-ssc-recruitment-2026/",
-      "hash": "87adb2c252293fe90eca063b5928590c41b9c156ebeb966132c9a9de8cf4c75b",
-      "emailed": true,
-      "pendingRetry": false,
-      "firstSeen": "2026-09-11T11:46:54.872Z",
-      "lastSeen": "2026-09-11T11:54:25.491Z",
-      "provisional": false,
-      "origin": "thirdparty:govtjobsalert",
-      "upgradedAt": "2026-09-11T11:54:25.491Z"
-    },
     "7d4c64df9f77e44d3a9238f740d8864bfbc13a948f4a51d49ee5810f9ed49edb": {
       "force": "UPSC",
       "exam": "CDS",
@@ -30,9 +13,9 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:34:34.270Z",
-      "lastSeen": "2026-09-11T12:36:23.575Z",
-      "changed": true
+      "firstSeen": "2026-09-11T12:42:34.269Z",
+      "lastSeen": "2026-09-11T12:42:34.269Z",
+      "changed": false
     },
     "6c6bdfb59bd8302c282515b1c9afa417993bd9f7adca85303f42fa9aa7cdb20d": {
       "force": "UPSC",
@@ -46,9 +29,9 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:34:34.283Z",
-      "lastSeen": "2026-09-11T12:36:23.578Z",
-      "changed": true
+      "firstSeen": "2026-09-11T12:42:34.272Z",
+      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "changed": false
     },
     "c6f78f2062da683df3e0d612d5b38da3f681023733be63dc60bf536888844cdf": {
       "force": "UPSC",
@@ -62,9 +45,9 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:34:34.285Z",
-      "lastSeen": "2026-09-11T12:36:23.578Z",
-      "changed": true
+      "firstSeen": "2026-09-11T12:42:34.272Z",
+      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "changed": false
     },
     "1966d2346aae8b7f9cc9ea2a471c01c733f4a2b67ca9987ce624a7ceaf25f43c": {
       "force": "UPSC",
@@ -78,9 +61,26 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T12:34:34.287Z",
-      "lastSeen": "2026-09-11T12:36:23.578Z",
-      "changed": true
+      "firstSeen": "2026-09-11T12:42:34.272Z",
+      "lastSeen": "2026-09-11T12:42:34.272Z",
+      "changed": false
+    },
+    "provisional::Indian Navy::SSC Officer": {
+      "force": "Indian Navy",
+      "exam": "SSC Officer",
+      "subCode": "SSC Officer",
+      "title": "Indian Navy SSC Officer Recruitment 2026: एसएससी ऑफिसर के लिए अधिसूचना जारी, 16 मई से आवेदन शुरू",
+      "status": "UNCONFIRMED",
+      "reason": "Any bachelor’s degree entry (unconfirmed) – likely eligible; verify.",
+      "url": "https://testbook.com/news/indian-navy-ssc-officer-recruitment-2026-out/",
+      "hash": "0d0c9447baad8b4321c8af147d22103b56b11b0321b0aba1a144128e9d789585",
+      "emailed": false,
+      "pendingRetry": true,
+      "firstSeen": "2026-09-11T12:42:41.552Z",
+      "lastSeen": "2026-09-11T12:42:41.561Z",
+      "provisional": true,
+      "admitCard": false,
+      "origin": "thirdparty:testbook"
     },
     "provisional::Indian Army::SSC Tech": {
       "force": "Indian Army",
@@ -93,8 +93,8 @@
       "hash": "2335589b3bbc144535431d922786d1c5e1ff6603f95aab58c3ec0ffe460377a2",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:34:41.618Z",
-      "lastSeen": "2026-09-11T12:36:30.404Z",
+      "firstSeen": "2026-09-11T12:42:41.555Z",
+      "lastSeen": "2026-09-11T12:42:41.561Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -110,8 +110,8 @@
       "hash": "cff633082a6cf4211c01dc819730bcf2af5166209cdea335a55d0658ccdfcd63",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:34:41.621Z",
-      "lastSeen": "2026-09-11T12:36:30.404Z",
+      "firstSeen": "2026-09-11T12:42:41.556Z",
+      "lastSeen": "2026-09-11T12:42:41.562Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -127,8 +127,8 @@
       "hash": "ba73994dfdc92b5e76e93a1afead503cb57ca087fc699adbbd2723351909b0f8",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:34:41.622Z",
-      "lastSeen": "2026-09-11T12:36:30.404Z",
+      "firstSeen": "2026-09-11T12:42:41.560Z",
+      "lastSeen": "2026-09-11T12:42:41.560Z",
       "provisional": true,
       "admitCard": false,
       "origin": "thirdparty:testbook"
@@ -144,25 +144,8 @@
       "hash": "369beaa58925bb02bc4050ad8e63555120094042fcb651f86f6f16759b3acc7e",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:34:41.623Z",
-      "lastSeen": "2026-09-11T12:36:30.404Z",
-      "provisional": true,
-      "admitCard": true,
-      "origin": "thirdparty:testbook"
-    },
-    "provisional::Indian Air Force::AFCAT::admit": {
-      "force": "Indian Air Force",
-      "exam": "AFCAT",
-      "subCode": "AFCAT",
-      "title": "AFCAT 2 Admit Card 2026 Out @afcat.edcil.co.in, Download Hall Ticket PDF",
-      "status": "ADMIT CARD (unconfirmed)",
-      "reason": "Admit card / hall ticket reported out – download and verify on the official site.",
-      "url": "https://testbook.com/news/afcat-hall-ticket-2026/",
-      "hash": "7c975bfabf72278ef6b7f58bffa5a1b3a0dd0fd08088d61ddfde9ffbc78ba76d",
-      "emailed": false,
-      "pendingRetry": true,
-      "firstSeen": "2026-09-11T12:34:41.623Z",
-      "lastSeen": "2026-09-11T12:36:30.404Z",
+      "firstSeen": "2026-09-11T12:42:41.562Z",
+      "lastSeen": "2026-09-11T12:42:41.562Z",
       "provisional": true,
       "admitCard": true,
       "origin": "thirdparty:testbook"

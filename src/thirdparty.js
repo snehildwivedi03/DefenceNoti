@@ -88,16 +88,79 @@ function extractListings($, base, selectors) {
   return out;
 }
 
-async function fetchSiteListings(site) {
+async function fetchSiteRaw(site) {
   const html = await httpGet(site.url);
   const $ = cheerio.load(html);
-  const raw = extractListings($, new URL(site.url), site.selectors);
+  return extractListings($, new URL(site.url), site.selectors).map((it) => ({ ...it, sourceSite: site.site }));
+}
+
+// ---- "Exam already concluded" engine ----
+// Post-exam artifacts (results, answer keys, response sheets, score cards) are
+// proof the exam has been held. If we see one for an exam edition, any admit
+// card for that SAME edition is stale and must not be alerted or shown.
+const POST_EXAM = /answer\s*key|response\s*sheet|\bresult\b|merit\s*list|score\s*-?card|final\s*result|cut\s*-?off/i;
+const ROMAN = { i: '1', ii: '2', iii: '3', iv: '4' };
+
+// Pull the edition number ("AFCAT 2", "CDS II", "CDS 1 2026") -> '2','2','1'.
+// Ignores 4-digit years and multi-digit vacancy counts via word boundaries.
+function editionNumber(title) {
+  const m = String(title).match(/\b(i{1,3}|iv|[1-4])\b/i);
+  if (!m) return '';
+  const t = m[1].toLowerCase();
+  return ROMAN[t] || t;
+}
+
+// First matching exam for a title, WITHOUT the EXCLUDE/NOISE filtering (we want
+// to see post-exam signals even though they are dropped from the alert stream).
+function examOf(title) {
+  for (const source of SOURCES) {
+    for (const exam of source.exams) {
+      if (exam.match.test(title)) return { force: source.force, exam: exam.exam };
+    }
+  }
+  return null;
+}
+
+function editionKey(force, exam, title) {
+  return `${force}::${exam}::${editionNumber(title)}`;
+}
+
+// Build the set of exam editions that have demonstrably already happened.
+function buildConcludedSet(titles) {
+  const set = new Set();
+  for (const title of titles) {
+    if (!POST_EXAM.test(title)) continue;
+    const ex = examOf(title);
+    if (ex) set.add(editionKey(ex.force, ex.exam, title));
+  }
+  return set;
+}
+
+// Fetch every configured third-party page, then classify. Each site is isolated:
+// one being unreachable or having broken markup never blocks the others. Admit
+// cards for exams that have already concluded are dropped.
+async function fetchThirdPartyListings() {
+  const raw = [];
+  for (const site of THIRD_PARTY_SOURCES) {
+    try {
+      raw.push(...(await fetchSiteRaw(site)));
+    } catch (err) {
+      console.warn(`  ! third-party ${site.site} failed: ${err.message}`);
+    }
+  }
+
+  const concluded = buildConcludedSet(raw.map((r) => r.title));
+
   const out = [];
   for (const item of raw) {
     const match = classifyTitle(item.title);
-    if (!match) continue; // unclassified or EXCLUDE -> out of scope, dropped.
+    if (!match) continue; // unclassified / EXCLUDE / NOISE -> out of scope.
+    if (match.admitCard && concluded.has(editionKey(match.force, match.exam, item.title))) {
+      console.log(`  - dropped stale admit card (exam already held): ${match.exam} ${editionNumber(item.title)}`);
+      continue;
+    }
     out.push({
-      sourceSite: site.site,
+      sourceSite: item.sourceSite,
       title: item.title,
       url: item.url,
       rawDate: item.rawDate,
@@ -111,19 +174,11 @@ async function fetchSiteListings(site) {
   return out;
 }
 
-// Fetch every configured third-party page. Each site is isolated: one site
-// being unreachable or having broken markup never blocks the others.
-async function fetchThirdPartyListings() {
-  const out = [];
-  for (const site of THIRD_PARTY_SOURCES) {
-    try {
-      const listings = await fetchSiteListings(site);
-      out.push(...listings);
-    } catch (err) {
-      console.warn(`  ! third-party ${site.site} failed: ${err.message}`);
-    }
-  }
-  return out;
-}
-
-module.exports = { fetchThirdPartyListings, classifyTitle, extractListings };
+module.exports = {
+  fetchThirdPartyListings,
+  classifyTitle,
+  extractListings,
+  buildConcludedSet,
+  editionKey,
+  editionNumber,
+};

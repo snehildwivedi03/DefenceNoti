@@ -33,7 +33,7 @@ global.fetch = async (url) => {
   };
 };
 
-const { fetchThirdPartyListings } = require('../src/thirdparty');
+const { fetchThirdPartyListings, buildConcludedSet, editionKey, editionNumber } = require('../src/thirdparty');
 const { processThirdParty } = require('../src/track');
 const { buildProvisionalEmail } = require('../src/email');
 const { hasConfirmedExam, upgradeProvisional, provisionalKey } = require('../src/store');
@@ -163,6 +163,26 @@ function pass(msg) {
   assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'graduate' }, admitCard: true, closed: true }), true, 'admit card still emailed even if window closed');
   assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'graduate' }, admitCard: false, closed: false }), true, 'open entry still emailed');
   pass('closed applications suppressed; admit cards still alert');
+
+  // 10. Concluded-exam engine: a result / answer key proves the exam was held,
+  //     so a matching-edition admit card is treated as stale and dropped.
+  const concluded = buildConcludedSet([
+    'AFCAT 2 Result 2026 Out, Download Scorecard @afcat.edcil.co.in',
+    'CDS 1 Answer Key 2026 Released',
+  ]);
+  assert.ok(
+    concluded.has(editionKey('Indian Air Force', 'AFCAT', 'AFCAT 2 Admit Card 2026 Out')),
+    'AFCAT 2 marked concluded from its result'
+  );
+  assert.strictEqual(
+    concluded.has(editionKey('UPSC', 'CDS', 'CDS 2 Admit Card 2026 Out')),
+    false,
+    'CDS 2 not concluded (only CDS 1 answer key seen)'
+  );
+  assert.strictEqual(editionNumber('UPSC CDS II 2026 Admit Card'), '2', 'roman II -> 2');
+  assert.strictEqual(editionNumber('AFCAT 2 Admit Card 2026'), '2', 'numeric edition parsed');
+  assert.strictEqual(editionNumber('Indian Army TGC 144 Notification'), '', 'no false edition from vacancy count');
+  pass('concluded-exam engine drops stale admit cards');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {
