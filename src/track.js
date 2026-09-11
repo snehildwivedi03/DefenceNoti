@@ -69,9 +69,9 @@ async function processLink(source, exam, link, state) {
     const prev = state.records[key];
     const nowIso = new Date().toISOString();
 
-    // Seen before -> refresh timestamp/hash but never re-email. Only a brand
-    // new notification (no prior record) sends an email.
-    if (prev) {
+    // Seen before -> refresh timestamp/hash but never re-email. Exception: if a
+    // prior send was eligible but FAILED (pendingRetry), try again this run.
+    if (prev && !prev.pendingRetry) {
       prev.lastSeen = nowIso;
       prev.hash = hash;
       continue;
@@ -95,9 +95,11 @@ async function processLink(source, exam, link, state) {
     };
 
     // Safeguard: only email when eligible (admit cards gated on qualification).
+    let emailSent = false;
     if (emailAllowed) {
       try {
         await sendResult(payload);
+        emailSent = true;
       } catch (err) {
         console.warn(`  ! Email failed for ${sub.code}: ${err.message}`);
       }
@@ -114,7 +116,8 @@ async function processLink(source, exam, link, state) {
       reason: result.reason,
       url: link.href,
       hash,
-      emailed: emailAllowed,
+      emailed: emailSent,
+      pendingRetry: emailAllowed && !emailSent,
       firstSeen: prev ? prev.firstSeen : nowIso,
       lastSeen: nowIso,
       changed: !!prev,
@@ -162,8 +165,9 @@ async function handleThirdPartyListing(item, state) {
   const key = provisionalKey(item.force, item.matchedExamCode);
   const prev = state.records[key];
 
-  // Already alerted provisionally -> just refresh, do not email again.
-  if (prev) {
+  // Already alerted provisionally -> just refresh, do not email again. Exception:
+  // if the prior send was eligible but FAILED (pendingRetry), try again below.
+  if (prev && !prev.pendingRetry) {
     prev.lastSeen = nowIso;
     prev.title = item.title;
     prev.url = item.url;
@@ -191,9 +195,11 @@ async function handleThirdPartyListing(item, state) {
     admitCard: true,
   });
 
+  let emailSent = false;
   if (emailAllowed) {
     try {
       await sendProvisional(payload);
+      emailSent = true;
     } catch (err) {
       console.warn(`  ! provisional email failed for ${item.matchedExamCode}: ${err.message}`);
     }
@@ -210,14 +216,15 @@ async function handleThirdPartyListing(item, state) {
     reason: note,
     url: item.url,
     hash: sha256(`${item.url}|${item.title}`),
-    emailed: emailAllowed,
-    firstSeen: nowIso,
+    emailed: emailSent,
+    pendingRetry: emailAllowed && !emailSent,
+    firstSeen: prev ? prev.firstSeen : nowIso,
     lastSeen: nowIso,
     provisional: true,
     origin: `thirdparty:${item.sourceSite}`,
   };
 
-  return { action: 'provisional-new', exam: item.matchedExamCode, item, payload, emailed: emailAllowed };
+  return { action: prev ? 'provisional-retry' : 'provisional-new', exam: item.matchedExamCode, item, payload, emailed: emailSent };
 }
 
 // Never let a third-party failure block or crash the official pipeline.

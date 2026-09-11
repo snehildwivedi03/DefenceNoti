@@ -115,7 +115,7 @@ function pass(msg) {
   assert.strictEqual(state.records[cdsKey].provisional, false, 'provisional upgraded to confirmed');
   pass('provisional -> confirmed upgrade');
 
-  // 7. Eligibility safeguard: only eligible alerts (and admit cards) go out.
+  // 7. Eligibility helpers remain available; current policy emails everything.
   assert.strictEqual(isAdmitCard('UPSC CDS II 2026 Admit Card Released'), true, 'admit card detected');
   assert.strictEqual(isAdmitCard('UPSC CDS II 2026 Notification'), false, 'notification is not an admit card');
 
@@ -124,22 +124,34 @@ function pass(msg) {
   assert.strictEqual(profileQualifies('engineering'), true, 'engineering entries qualify (CSE)');
   assert.strictEqual(profileQualifies('flying'), false, 'flying not qualification-gated');
 
-  // Regular notifications: NOT ELIGIBLE is suppressed, ELIGIBLE passes.
-  assert.strictEqual(passesEmailGate({ status: NOT_ELIGIBLE, subEntry: { qualType: 'graduate' }, admitCard: false }), false, 'NOT ELIGIBLE suppressed');
-  assert.strictEqual(passesEmailGate({ status: ELIGIBLE, subEntry: { qualType: 'graduate' }, admitCard: false }), true, 'ELIGIBLE passes');
-  // watch/backup entries always pass, even when NOT ELIGIBLE.
-  assert.strictEqual(passesEmailGate({ status: NOT_ELIGIBLE, subEntry: { qualType: 'flying', watch: true }, admitCard: false }), true, 'watch entry bypasses gate');
-  // Admit cards: gated purely on profile qualification.
-  assert.strictEqual(passesEmailGate({ subEntry: { qualType: 'engineering' }, admitCard: true }), true, 'admit card for a qualifying entry passes');
-  assert.strictEqual(passesEmailGate({ subEntry: { qualType: 'flying', watch: false }, admitCard: true }), false, 'admit card for a non-qualifying entry suppressed');
-  assert.strictEqual(passesEmailGate({ subEntry: { qualType: 'flying', watch: true }, admitCard: true }), true, 'watch admit card still passes');
+  // Current policy: alert on everything, regardless of computed status.
+  assert.strictEqual(passesEmailGate({ status: NOT_ELIGIBLE, subEntry: { qualType: 'graduate' }, admitCard: false }), true, 'email-all: NOT ELIGIBLE still alerts');
+  assert.strictEqual(passesEmailGate({ status: ELIGIBLE, subEntry: { qualType: 'graduate' }, admitCard: false }), true, 'email-all: ELIGIBLE alerts');
+  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'engineering' }, admitCard: true }), true, 'email-all: admit cards alert');
+  pass('email-all policy + eligibility helpers');
 
-  // STRICT mode additionally suppresses UNCERTAIN regular notifications.
-  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'engineering' }, admitCard: false }), true, 'UNCERTAIN passes by default');
-  process.env.STRICT_ELIGIBLE_ONLY = '1';
-  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'engineering' }, admitCard: false }), false, 'UNCERTAIN suppressed in strict mode');
-  delete process.env.STRICT_ELIGIBLE_ONLY;
-  pass('eligibility safeguard gate');
+  // 8. A FAILED send sets pendingRetry and is retried on the next run.
+  const savedUser = process.env.SMTP_USER;
+  const savedPass = process.env.SMTP_PASS;
+  delete process.env.DRY_RUN;    // force the real deliver() path
+  delete process.env.SMTP_USER;  // guarantee makeTransport() throws -> send fails
+  delete process.env.SMTP_PASS;
+
+  const stateR = { updatedAt: null, records: {} };
+  const r1 = await processThirdParty(stateR);
+  const cdsR1 = r1.find((r) => r.exam === 'CDS' && r.action === 'provisional-new');
+  assert.ok(cdsR1, 'CDS provisional attempted');
+  assert.strictEqual(cdsR1.emailed, false, 'failed send -> emailed:false');
+  const recR = stateR.records[provisionalKey('UPSC', 'CDS')];
+  assert.strictEqual(recR.pendingRetry, true, 'pendingRetry set after a failed send');
+
+  const r2 = await processThirdParty(stateR);
+  assert.strictEqual(r2.find((r) => r.exam === 'CDS').action, 'provisional-retry', 'failed send is retried, not skipped');
+
+  process.env.DRY_RUN = '1';
+  if (savedUser !== undefined) process.env.SMTP_USER = savedUser;
+  if (savedPass !== undefined) process.env.SMTP_PASS = savedPass;
+  pass('failed send retries on next run (pendingRetry)');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {
