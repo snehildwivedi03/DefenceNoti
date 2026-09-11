@@ -8,7 +8,7 @@ const { sendResult, sendProvisional } = require('./email');
 const { load, save, prune, provisionalKey, hasConfirmedExam, upgradeProvisional } = require('./store');
 const { sha256 } = require('./util');
 const { fetchThirdPartyListings } = require('./thirdparty');
-const { cleanState } = require('./cleaner');
+const { cleanState, isApplicationClosed } = require('./cleaner');
 // Only follow links that look like a notification (PDF or advert page).
 function looksLikeNotification(href, text) {
   const blob = `${href} ${text}`;
@@ -173,11 +173,21 @@ async function handleThirdPartyListing(item, state) {
   const closed = isClosed(item.title);
   const key = provisionalKey(item.force, item.matchedExamCode, admit ? 'admit' : 'notice');
 
+  // The headline rarely carries the deadline, so for a notification read the
+  // aggregator's detail page and treat a past application last-date as closed.
+  let windowOver = closed;
+  if (!admit && !windowOver) {
+    try {
+      const detail = await extractText(item.url);
+      if (!detail.startsWith('__FETCH_ERROR__') && isApplicationClosed(detail)) windowOver = true;
+    } catch { /* keep the item on any fetch/parse failure */ }
+  }
+
   // Application window has ended (and it is not an admit card) -> no alert.
   // Drop any stale provisional so the website stops showing the dead entry.
-  if (closed && !admit) {
+  if (windowOver && !admit) {
     delete state.records[key];
-    console.log(`  - skipped provisional (application closed): ${item.matchedExamCode}`);
+    console.log(`  - skipped provisional (application window over): ${item.matchedExamCode}`);
     return { action: 'closed-skip', exam: item.matchedExamCode, item };
   }
 

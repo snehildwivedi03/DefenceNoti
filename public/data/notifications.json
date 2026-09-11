@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-11T13:01:38.310Z",
+  "updatedAt": "2026-09-11T13:22:49.815Z",
   "records": {
     "7d4c64df9f77e44d3a9238f740d8864bfbc13a948f4a51d49ee5810f9ed49edb": {
       "force": "UPSC",
@@ -13,8 +13,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T13:01:31.377Z",
-      "lastSeen": "2026-09-11T13:01:31.377Z",
+      "firstSeen": "2026-09-11T13:22:40.317Z",
+      "lastSeen": "2026-09-11T13:22:40.317Z",
       "changed": false
     },
     "6c6bdfb59bd8302c282515b1c9afa417993bd9f7adca85303f42fa9aa7cdb20d": {
@@ -29,8 +29,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T13:01:31.380Z",
-      "lastSeen": "2026-09-11T13:01:31.380Z",
+      "firstSeen": "2026-09-11T13:22:40.324Z",
+      "lastSeen": "2026-09-11T13:22:40.324Z",
       "changed": false
     },
     "c6f78f2062da683df3e0d612d5b38da3f681023733be63dc60bf536888844cdf": {
@@ -45,8 +45,8 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T13:01:31.380Z",
-      "lastSeen": "2026-09-11T13:01:31.380Z",
+      "firstSeen": "2026-09-11T13:22:40.325Z",
+      "lastSeen": "2026-09-11T13:22:40.325Z",
       "changed": false
     },
     "1966d2346aae8b7f9cc9ea2a471c01c733f4a2b67ca9987ce624a7ceaf25f43c": {
@@ -61,43 +61,9 @@
       "emailed": false,
       "pendingRetry": true,
       "admitCard": true,
-      "firstSeen": "2026-09-11T13:01:31.381Z",
-      "lastSeen": "2026-09-11T13:01:31.381Z",
+      "firstSeen": "2026-09-11T13:22:40.325Z",
+      "lastSeen": "2026-09-11T13:22:40.325Z",
       "changed": false
-    },
-    "provisional::Indian Army::TGC": {
-      "force": "Indian Army",
-      "exam": "TGC",
-      "subCode": "TGC",
-      "title": "Indian Army TGC 144 Notification 2026 Out, Apply Link Active and Check Eligibility",
-      "status": "UNCONFIRMED",
-      "reason": "Engineering entry (unconfirmed) – verify CSE is in the discipline list.",
-      "url": "https://testbook.com/news/indian-army-tgc-144-notification-2026/",
-      "hash": "ba73994dfdc92b5e76e93a1afead503cb57ca087fc699adbbd2723351909b0f8",
-      "emailed": false,
-      "pendingRetry": true,
-      "firstSeen": "2026-09-11T13:01:38.306Z",
-      "lastSeen": "2026-09-11T13:01:38.306Z",
-      "provisional": true,
-      "admitCard": false,
-      "origin": "thirdparty:testbook"
-    },
-    "provisional::Indian Army::SSC Tech": {
-      "force": "Indian Army",
-      "exam": "SSC Tech",
-      "subCode": "SSC Tech",
-      "title": "Indian Army SSC Tech Notification 2026 Out For 30 Vacancies",
-      "status": "UNCONFIRMED",
-      "reason": "Engineering entry (unconfirmed) – verify CSE is in the discipline list.",
-      "url": "https://testbook.com/news/indian-army-ssc-tech-notification-2026-out/",
-      "hash": "2335589b3bbc144535431d922786d1c5e1ff6603f95aab58c3ec0ffe460377a2",
-      "emailed": false,
-      "pendingRetry": true,
-      "firstSeen": "2026-09-11T13:01:38.308Z",
-      "lastSeen": "2026-09-11T13:01:38.308Z",
-      "provisional": true,
-      "admitCard": false,
-      "origin": "thirdparty:testbook"
     },
     "provisional::UPSC::CDS::admit": {
       "force": "UPSC",
@@ -110,8 +76,8 @@
       "hash": "369beaa58925bb02bc4050ad8e63555120094042fcb651f86f6f16759b3acc7e",
       "emailed": false,
       "pendingRetry": true,
-      "firstSeen": "2026-09-11T13:01:38.309Z",
-      "lastSeen": "2026-09-11T13:01:38.309Z",
+      "firstSeen": "2026-09-11T13:22:49.814Z",
+      "lastSeen": "2026-09-11T13:22:49.814Z",
       "provisional": true,
       "admitCard": true,
       "origin": "thirdparty:testbook"

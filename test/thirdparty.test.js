@@ -37,7 +37,7 @@ const { fetchThirdPartyListings, buildConcludedSet, buildLatestCycle, isSupersed
 const { processThirdParty } = require('../src/track');
 const { buildProvisionalEmail } = require('../src/email');
 const { hasConfirmedExam, upgradeProvisional, provisionalKey } = require('../src/store');
-const { isStale, newestDate, cleanState } = require('../src/cleaner');
+const { isStale, newestDate, cleanState, applicationDeadline, isApplicationClosed } = require('../src/cleaner');
 const {
   passesEmailGate,
   profileQualifies,
@@ -247,6 +247,32 @@ function pass(msg) {
   assert.ok(!cleanTarget.records.dead, 'expired record deleted from state');
   assert.ok(cleanTarget.records.alive, 'live record retained');
   pass('lifecycle cleaner expires closed-window / held-exam entries and purges the JSON');
+
+  // 13. Detail-page deadline parser: the last date lives in the article body,
+  //     not the headline. A past last-date / closed apply window => expired.
+  const asOfNov = new Date('2026-09-11T00:00:00Z');
+  assert.strictEqual(
+    isApplicationClosed('Last Date to Apply 11 June 2026 Exam Date To Be Announced', asOfNov),
+    true,
+    'labelled last date in the past -> closed'
+  );
+  assert.strictEqual(
+    isApplicationClosed('Candidates can apply online from 9 July to 7 August 2026 for the April 2027 course', asOfNov),
+    true,
+    'apply window ended -> closed (future course session ignored)'
+  );
+  assert.strictEqual(
+    isApplicationClosed('Last Date to Apply 20 December 2026, hurry now', asOfNov),
+    false,
+    'future last date -> still open'
+  );
+  assert.strictEqual(isApplicationClosed('No dates mentioned here at all', asOfNov), false, 'no date -> not closed');
+  assert.strictEqual(
+    applicationDeadline('Last Date to Apply 11 June 2026 Exam', asOfNov).getUTCDate(),
+    11,
+    'exact day parsed (not swallowed by the year)'
+  );
+  pass('detail-page deadline parser flags expired application windows');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {
