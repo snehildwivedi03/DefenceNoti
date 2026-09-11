@@ -24,7 +24,7 @@ const payload = {
   sourceSite: 'govtjobsalert',
   rawDate: '07 Sep 2026',
   status: 'UNCONFIRMED (third-party)',
-  reason: 'Test email from GovNoti email service - CDS II 2026 admit card notification.',
+  reason: 'Test email from TrackMyNextAttempt email service - CDS II 2026 admit card notification.',
 };
 
 sendProvisional(payload)

@@ -1,4 +1,4 @@
-name: Defence Notification Tracker
+name: TrackMyNextAttempt Tracker
 
 on:
   schedule:

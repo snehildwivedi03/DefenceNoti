@@ -1,5 +1,5 @@
 {
-  "name": "govnoti",
+  "name": "trackmynextattempt",
   "version": "1.0.0",
   "private": true,
   "description": "Personal Indian Defence officer-entry notification tracker (runs on GitHub Actions, UI on Netlify).",

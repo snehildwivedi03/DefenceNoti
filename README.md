@@ -1,4 +1,4 @@
-# govnoti — Indian Defence officer-entry notification tracker
+# TrackMyNextAttempt — Indian Defence officer-entry notification tracker
 
 Lightweight personal tracker. A **GitHub Actions** job runs **twice a day**, checks
 the official recruitment sites, detects new/changed officer-entry notifications,
