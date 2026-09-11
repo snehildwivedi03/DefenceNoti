@@ -60,6 +60,7 @@ function render() {
       }</span>
           <span class="tags">${admitBadge}${provBadge}<span class="tag ${tagClass(r.status)}">${esc(r.status)}</span></span>
         </div>
+        ${r.firstSeen ? `<div class="meta date">notified ${esc(fmtDate(r.firstSeen))}</div>` : ''}
         <div class="meta">${esc(r.title || '')}</div>
         <div class="reason">${esc(r.reason || '')}</div>
         <div class="meta"><a href="${esc(r.url)}" target="_blank" rel="noopener">official notification &rarr;</a></div>
@@ -67,6 +68,11 @@ function render() {
       }
     )
     .join('');
+}
+
+function fmtDate(v) {
+  const d = new Date(v);
+  return isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function esc(s) {
@@ -91,7 +97,7 @@ fetch('data/notifications.json?t=' + Date.now())
   .then((r) => r.json())
   .then((data) => {
     records = Object.values(data.records || {});
-    updatedEl.textContent = data.updatedAt ? '\u00b7 updated ' + new Date(data.updatedAt).toLocaleString() : '';
+    updatedEl.textContent = data.updatedAt ? 'updated ' + new Date(data.updatedAt).toLocaleString() : '';
     buildFilters();
     render();
   })
