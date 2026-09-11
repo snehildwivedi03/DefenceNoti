@@ -7,6 +7,24 @@ const updatedEl = document.getElementById('updated');
 let records = [];
 let filter = 'ALL';
 
+// Force logos: real images for the three services, SVG shield fallback for UPSC.
+// Filenames are case-sensitive on the Netlify (Linux) host.
+const ICONS = {
+  navy: '<img class="ficon" src="images/Navy.png" alt="" aria-hidden="true" />',
+  air: '<img class="ficon" src="images/Airforce.png" alt="" aria-hidden="true" />',
+  army: '<img class="ficon" src="images/army.png" alt="" aria-hidden="true" />',
+  upsc:
+    '<svg class="ficon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 2v6c0 4-3 7-7 9-4-2-7-5-7-9V5z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v6M9 11h6" stroke="currentColor" stroke-width="1.7"/></svg>',
+};
+
+function forceMeta(force) {
+  const f = String(force || '').toLowerCase();
+  if (f.includes('navy')) return { cls: 'force-navy', icon: ICONS.navy };
+  if (f.includes('air')) return { cls: 'force-air', icon: ICONS.air };
+  if (f.includes('army')) return { cls: 'force-army', icon: ICONS.army };
+  return { cls: 'force-upsc', icon: ICONS.upsc };
+}
+
 function tagClass(status) {
   if (status === 'ELIGIBLE') return 'ok';
   if (status === 'NOT ELIGIBLE') return 'no';
@@ -25,10 +43,12 @@ function render() {
 
   listEl.innerHTML = rows
     .map(
-      (r) => `
-      <div class="item">
+      (r) => {
+        const m = forceMeta(r.force);
+        return `
+      <div class="item ${m.cls}">
         <div class="top">
-          <span>${esc(r.force)} &middot; ${esc(r.exam)} &middot; ${esc(r.subCode)}${
+          <span class="title">${m.icon}${esc(r.force)} &middot; ${esc(r.exam)} &middot; ${esc(r.subCode)}${
         r.changed ? ' (updated)' : ''
       }</span>
           <span class="tag ${tagClass(r.status)}">${esc(r.status)}</span>
@@ -36,7 +56,8 @@ function render() {
         <div class="meta">${esc(r.title || '')}</div>
         <div class="reason">${esc(r.reason || '')}</div>
         <div class="meta"><a href="${esc(r.url)}" target="_blank" rel="noopener">official notification &rarr;</a></div>
-      </div>`
+      </div>`;
+      }
     )
     .join('');
 }

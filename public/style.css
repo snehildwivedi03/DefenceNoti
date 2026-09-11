@@ -3,7 +3,11 @@
 body {
   margin: 0;
   padding: 16px;
-  background: #d8d8cf;
+  /* very light, subtle Indian-flag tricolor wash over the base tone */
+  background:
+    linear-gradient(180deg, rgba(255, 153, 51, 0.10), rgba(255, 255, 255, 0) 40% 60%, rgba(19, 136, 8, 0.10)),
+    #d8d8cf;
+  background-attachment: fixed;
   color: #1a1a1a;
   font: 13px/1.5 "Courier New", Courier, monospace;
 }
@@ -37,12 +41,43 @@ main { max-width: 820px; margin: 0 auto; }
 .list { display: flex; flex-direction: column; gap: 8px; }
 
 .item {
+  position: relative;
   border: 1px solid #1a1a1a;
-  padding: 8px;
-  background: #cfcfc5;
+  padding: 8px 8px 8px 14px;
+  /* very subtle Indian-flag wash behind the card */
+  background:
+    linear-gradient(180deg, rgba(255, 153, 51, 0.06), rgba(255, 255, 255, 0) 45%, rgba(19, 136, 8, 0.06)),
+    #cfcfc5;
+}
+
+/* tricolor accent stripe down the left edge */
+.item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #ff9933 0 33.3%, #f4f4f4 33.3% 66.6%, #138808 66.6% 100%);
 }
 
 .item .top { display: flex; justify-content: space-between; gap: 8px; }
+.item .title { display: inline-flex; align-items: center; }
+
+.ficon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin-right: 7px;
+  vertical-align: -5px;
+  object-fit: contain;
+}
+
+/* per-force icon colours (icons draw with currentColor) */
+.force-navy .ficon { color: #1b3a6b; }
+.force-air  .ficon { color: #2f6f9f; }
+.force-army .ficon { color: #4b5320; }
+.force-upsc .ficon { color: #6a1b1b; }
 
 .tag { border: 1px solid #1a1a1a; padding: 0 6px; white-space: nowrap; }
 .tag.ok { background: #1a1a1a; color: #d8d8cf; }
