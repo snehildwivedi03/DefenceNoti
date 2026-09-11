@@ -106,16 +106,9 @@ function profileQualifies(qualType) {
   }
 }
 
-// Safeguard: decide whether an alert should actually be emailed.
-//   - watch (hope/backup) entries always pass, by design.
-//   - admit cards carry no criteria, so gate on static PROFILE qualification.
-//   - a deterministic NOT ELIGIBLE is never emailed.
-//   - UNCERTAIN is emailed unless STRICT_ELIGIBLE_ONLY is set.
-function passesEmailGate({ status, subEntry, admitCard }) {
-  if (subEntry && subEntry.watch) return true;
-  if (admitCard) return profileQualifies(subEntry ? subEntry.qualType : null);
-  if (status === NOT_ELIGIBLE) return false;
-  if (status === UNCERTAIN && process.env.STRICT_ELIGIBLE_ONLY) return false;
+// Alerts are sent for every notification/admit card discovered, regardless of
+// the computed eligibility status (ELIGIBLE / UNCERTAIN / NOT ELIGIBLE).
+function passesEmailGate() {
   return true;
 }
 

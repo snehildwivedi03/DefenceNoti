@@ -88,6 +88,7 @@ async function processLink(source, exam, link, state) {
       url: link.href,
       appUrl: null,
       source: source.url,
+      admitCard,
       fields,
     };
 

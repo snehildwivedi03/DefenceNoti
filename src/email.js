@@ -16,7 +16,8 @@ function makeTransport() {
 }
 
 function buildEmail(r) {
-  const subject = `[${r.status}] ${r.force} ${r.exam} - ${r.subCode}${r.year ? ' ' + r.year : ''}`;
+  const heading = r.admitCard ? 'ADMIT CARD' : r.status;
+  const subject = `[${heading}] ${r.force} ${r.exam} - ${r.subCode}${r.year ? ' ' + r.year : ''}`;
   const line = (k, v) => `${k.padEnd(22)}: ${v || 'N/A'}`;
   const body = [
     line('Entry / Exam', `${r.exam} (${r.subCode})`),
