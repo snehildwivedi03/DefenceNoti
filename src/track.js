@@ -69,9 +69,11 @@ async function processLink(source, exam, link, state) {
     const prev = state.records[key];
     const nowIso = new Date().toISOString();
 
-    // Already emailed and content unchanged -> just refresh lastSeen.
-    if (prev && prev.hash === hash) {
+    // Seen before -> refresh timestamp/hash but never re-email. Only a brand
+    // new notification (no prior record) sends an email.
+    if (prev) {
       prev.lastSeen = nowIso;
+      prev.hash = hash;
       continue;
     }
 
