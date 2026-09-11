@@ -41,6 +41,7 @@ const {
   passesEmailGate,
   profileQualifies,
   isAdmitCard,
+  isClosed,
   ELIGIBLE,
   NOT_ELIGIBLE,
   UNCERTAIN,
@@ -152,6 +153,15 @@ function pass(msg) {
   if (savedUser !== undefined) process.env.SMTP_USER = savedUser;
   if (savedPass !== undefined) process.env.SMTP_PASS = savedPass;
   pass('failed send retries on next run (pendingRetry)');
+
+  // 9. Closed application windows are suppressed (but admit cards still pass).
+  assert.strictEqual(isClosed('SSC (various entries) Jun 27 Course is extended (Closed)'), true, '"(Closed)" is detected');
+  assert.strictEqual(isClosed('Registration closed for this entry'), true, 'registration closed detected');
+  assert.strictEqual(isClosed('Online application window is live. Login to apply.'), false, 'open window not flagged');
+  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'graduate' }, admitCard: false, closed: true }), false, 'closed non-admit entry is NOT emailed');
+  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'graduate' }, admitCard: true, closed: true }), true, 'admit card still emailed even if window closed');
+  assert.strictEqual(passesEmailGate({ status: UNCERTAIN, subEntry: { qualType: 'graduate' }, admitCard: false, closed: false }), true, 'open entry still emailed');
+  pass('closed applications suppressed; admit cards still alert');
 
   console.log('\nAll third-party tests passed.');
 })().catch((err) => {

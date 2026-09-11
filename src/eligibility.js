@@ -85,6 +85,14 @@ function isAdmitCard(text) {
   return ADMIT_CARD_RE.test(text || '');
 }
 
+// Explicit "application window has ended" markers. Deliberately conservative:
+// only fires on unambiguous wording so genuinely open entries are never dropped.
+const CLOSED_RE = /\(\s*closed\s*\)|closed\s*for\s*(?:application|registration)|application[s]?\s*(?:window\s*)?(?:is|are|has|have|been|now)?\s*closed|registration\s*(?:is\s*)?closed|window\s*(?:is\s*)?closed|last\s*date\s*(?:is\s*)?(?:over|passed|expired)|link\s*(?:is\s*)?(?:now\s*)?(?:closed|deactivated|disabled)/i;
+
+function isClosed(text) {
+  return CLOSED_RE.test(text || '');
+}
+
 // Deterministic qualification-only eligibility from the PROFILE, independent of
 // any notification text. Used for admit cards / third-party listings whose text
 // carries no age or qualification criteria of its own.
@@ -107,14 +115,19 @@ function profileQualifies(qualType) {
 }
 
 // Alerts are sent for every notification/admit card discovered, regardless of
-// the computed eligibility status (ELIGIBLE / UNCERTAIN / NOT ELIGIBLE).
-function passesEmailGate() {
+// the computed eligibility status (ELIGIBLE / UNCERTAIN / NOT ELIGIBLE) -- the
+// ONE exception being entries whose application window has clearly closed.
+// Admit cards are always allowed through: they are released after applications
+// close and are exactly what the user still needs at that stage.
+function passesEmailGate(ctx) {
+  if (ctx && ctx.closed && !ctx.admitCard) return false;
   return true;
 }
 
 module.exports = {
   classify,
   isAdmitCard,
+  isClosed,
   profileQualifies,
   passesEmailGate,
   ELIGIBLE,

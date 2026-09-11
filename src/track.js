@@ -3,7 +3,7 @@
 const { SOURCES, EXCLUDE } = require('./config');
 const { getLinks, extractText } = require('./fetcher');
 const { parseNotification } = require('./parser');
-const { classify, isAdmitCard, passesEmailGate } = require('./eligibility');
+const { classify, isAdmitCard, isClosed, passesEmailGate } = require('./eligibility');
 const { sendResult, sendProvisional } = require('./email');
 const { load, save, prune, provisionalKey, hasConfirmedExam, upgradeProvisional } = require('./store');
 const { sha256 } = require('./util');
@@ -63,6 +63,17 @@ async function processLink(source, exam, link, state) {
   const fields = parseNotification(text);
   const year = yearFrom(`${link.text} ${text.slice(0, 400)}`);
   const admitCard = isAdmitCard(`${link.text} ${text.slice(0, 3000)}`);
+  const closed = isClosed(`${link.text} ${text.slice(0, 3000)}`);
+
+  // Application window has ended (and it is not an admit card) -> no alert.
+  // Drop any stale record so the website stops showing the dead entry.
+  if (closed && !admitCard) {
+    for (const sub of exam.subEntries) {
+      delete state.records[sha256(`${notifId}::${sub.code}`)];
+    }
+    console.log(`  - skipped (application closed): ${exam.exam} :: ${link.text.slice(0, 60)}`);
+    return;
+  }
 
   for (const sub of exam.subEntries) {
     const key = sha256(`${notifId}::${sub.code}`);
@@ -78,7 +89,7 @@ async function processLink(source, exam, link, state) {
     }
 
     const result = classify({ text, subEntry: sub, fields });
-    const emailAllowed = passesEmailGate({ status: result.status, subEntry: sub, admitCard });
+    const emailAllowed = passesEmailGate({ status: result.status, subEntry: sub, admitCard, closed });
     const payload = {
       force: source.force,
       exam: exam.exam,
@@ -156,13 +167,24 @@ function basicProvisionalNote(qualType) {
 async function handleThirdPartyListing(item, state) {
   const nowIso = new Date().toISOString();
 
+  const key = provisionalKey(item.force, item.matchedExamCode);
+  const admit = isAdmitCard(item.title);
+  const closed = isClosed(item.title);
+
+  // Application window has ended (and it is not an admit card) -> no alert.
+  // Drop any stale provisional so the website stops showing the dead entry.
+  if (closed && !admit) {
+    delete state.records[key];
+    console.log(`  - skipped provisional (application closed): ${item.matchedExamCode}`);
+    return { action: 'closed-skip', exam: item.matchedExamCode, item };
+  }
+
   // Already tracked from an official fetch -> corroboration only, no email.
   if (hasConfirmedExam(state, item.force, item.matchedExamCode)) {
     console.log(`  ~ corroboration: ${item.matchedExamCode} already tracked officially (also seen on ${item.sourceSite}).`);
     return { action: 'corroborated', exam: item.matchedExamCode, item };
   }
 
-  const key = provisionalKey(item.force, item.matchedExamCode);
   const prev = state.records[key];
 
   // Already alerted provisionally -> just refresh, do not email again. Exception:
@@ -188,11 +210,12 @@ async function handleThirdPartyListing(item, state) {
     reason: note,
   };
 
-  // Same safeguard as the official path: only alert for exams the profile
-  // qualifies for (or watch/backup entries). No age criteria on these listings.
+  // Same safeguard as the official path: suppress only closed windows.
+  // No age criteria on these listings; admit cards always pass.
   const emailAllowed = passesEmailGate({
     subEntry: { qualType: item.qualType, watch: item.watch },
-    admitCard: true,
+    admitCard: admit,
+    closed,
   });
 
   let emailSent = false;
